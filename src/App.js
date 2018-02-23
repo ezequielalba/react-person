@@ -6,14 +6,17 @@ class App extends Component {
   state = {
     persons: [
       {
+        id: 'asd',
         name: 'Max',
         age: 28
       },
       {
+        id: 'asd1',
         name: 'Manu',
         age: 29
       },
       {
+        id: 'asd2',
         name: 'Stephanie',
         age: 26
       }
@@ -21,22 +24,28 @@ class App extends Component {
     showPersons: false
   }
 
-  nameChangedHandler = (event) => {
+  nameChangedHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
+    });
+
+    const person = {
+      //Distribute all the properties of the persons object into the new one
+      ...this.state.persons[personIndex]
+    };
+
+    // Alternative ==> const person = Object.assign({}, this.state.persons[personIndex]);
+
+    person.name = event.target.value;
+
+    //Copy of the original persons array
+    const persons = [...this.state.persons];
+
+    //Assignment of the id
+    persons[personIndex] = person;
+
     this.setState({
-      persons: [
-        {
-          name: 'Max',
-          age: 28
-        },
-        {
-          name: event.target.value,
-          age: 29
-        },
-        {
-          name: 'Stephanie',
-          age: 27
-        }
-      ]
+      persons: persons
     })
   }
 
@@ -60,19 +69,31 @@ class App extends Component {
         <div>
           {this.state.persons.map((person, index) => {
             return <Person
-              click={this.deletePersonHandler.bind(this, index)}
+              click={() => this.deletePersonHandler(index)}
               name={person.name}
-              age={person.age} />
+              age={person.age}
+              key={person.id}
+              changed={(event) => this.nameChangedHandler(event, person.id)} />
           })}
         </div>
       );
     }
 
+    const classes = [];
+
+    if (this.state.persons.length <= 2) {
+      classes.push('red'); // classes = ['red']
+    }
+
+    if (this.state.persons.length <= 1) {
+      classes.push('bold'); // classes = ['red', 'bold']
+    }
+
     return (
       <div className="App">
         <h1>Hi, I'm a React App</h1>
-        <p>This is really working!</p>
-        <button onClick={this.togglePersonsHandler}>Switch Name</button>
+        <p className={classes.join(' ')}>This is really working!</p>
+        <button onClick={this.togglePersonsHandler}>Toggle Persons</button>
         {persons}
       </div>
     );
